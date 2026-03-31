@@ -5,6 +5,8 @@ import Link from "next/link";
 import { getArticleBySlug, getRelatedArticles } from "@/lib/queries/articles";
 import { renderMarkdown } from "@/lib/markdown";
 import ArticleCard from "@/components/public/ArticleCard";
+import { getUserSession } from "@/lib/user-auth";
+import CommentSection from "@/components/public/CommentSection";
 
 export const revalidate = 60;
 
@@ -36,9 +38,10 @@ export default async function ArticlePage({ params }: Props) {
   const article = await getArticleBySlug(slug);
   if (!article) notFound();
 
-  const [htmlBody, relatedArticles] = await Promise.all([
+  const [htmlBody, relatedArticles, user] = await Promise.all([
     renderMarkdown(article.body),
     getRelatedArticles(article.id, article.categoryId, 4),
+    getUserSession(),
   ]);
 
   const jsonLd = {
@@ -130,6 +133,9 @@ export default async function ArticlePage({ params }: Props) {
           className="prose prose-neutral max-w-none text-ink leading-relaxed"
           dangerouslySetInnerHTML={{ __html: htmlBody }}
         />
+
+        {/* Comments */}
+        <CommentSection articleId={article.id} user={user} />
 
         {/* Tags */}
         {article.tags.length > 0 && (

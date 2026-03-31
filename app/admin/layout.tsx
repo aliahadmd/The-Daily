@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getPendingCommentCount } from "@/lib/queries/comments";
 
 const navLinks = [
   { href: "/admin", label: "Dashboard" },
@@ -8,9 +9,13 @@ const navLinks = [
   { href: "/admin/categories", label: "Categories" },
   { href: "/admin/tags", label: "Tags" },
   { href: "/admin/countries", label: "Countries" },
+  { href: "/admin/comments", label: "Comments" },
+  { href: "/admin/users", label: "Users" },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pendingCount = await getPendingCommentCount();
+
   return (
     <div className="min-h-screen flex" style={{ background: "var(--cream)" }}>
       {/* Sidebar */}
@@ -37,7 +42,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="block px-5 py-2.5 text-sm font-semibold tracking-wide uppercase transition-colors hover:bg-ink hover:text-cream"
               style={{ color: "var(--ink-light)" }}
             >
-              {link.label}
+              <span className="flex items-center justify-between">
+                {link.label}
+                {link.href === "/admin/comments" && pendingCount > 0 && (
+                  <span
+                    className="ml-2 text-xs font-bold px-1.5 py-0.5 rounded-full"
+                    style={{ background: "var(--ink)", color: "var(--cream)" }}
+                  >
+                    {pendingCount}
+                  </span>
+                )}
+              </span>
             </Link>
           ))}
         </nav>

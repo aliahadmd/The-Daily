@@ -2,9 +2,10 @@ import Link from "next/link";
 
 interface NavBarProps {
   categories: { name: string; slug: string }[];
+  user?: { username: string } | null;
 }
 
-export default function NavBar({ categories }: NavBarProps) {
+export default function NavBar({ categories, user }: NavBarProps) {
   return (
     <header className="sticky top-0 z-50 bg-cream border-b border-border">
       {/* Masthead */}
@@ -40,6 +41,38 @@ export default function NavBar({ categories }: NavBarProps) {
             </li>
           ))}
         </ul>
+
+        {/* Auth area */}
+        <div className="flex items-center gap-2 shrink-0 text-sm">
+          {user ? (
+            <>
+              <span className="font-semibold text-ink">{user.username}</span>
+              <form action="/api/auth/logout" method="POST">
+                <button
+                  type="submit"
+                  className="px-2 py-1 text-sm font-semibold text-ink hover:text-accent transition-colors uppercase tracking-wide"
+                >
+                  Log out
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="px-2 py-1 text-sm font-semibold text-ink hover:text-accent transition-colors uppercase tracking-wide"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/register"
+                className="px-2 py-1 text-sm font-semibold text-ink hover:text-accent transition-colors uppercase tracking-wide"
+              >
+                Register
+              </Link>
+            </>
+          )}
+        </div>
 
         {/* Search form */}
         <form action="/search" method="GET" className="flex items-center gap-1 shrink-0">

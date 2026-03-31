@@ -87,3 +87,29 @@ export const videoPostTags = pgTable("video_post_tags", {
   videoPostId: integer("video_post_id").notNull().references(() => videoPosts.id, { onDelete: "cascade" }),
   tagId: integer("tag_id").notNull().references(() => tags.id, { onDelete: "cascade" }),
 });
+
+export const userStatusEnum = pgEnum("user_status", ["active", "banned"]);
+
+export const commentStatusEnum = pgEnum("comment_status", ["pending", "approved", "rejected"]);
+
+export const publicUsers = pgTable("public_users", {
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  status: userStatusEnum("status").default("active").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const comments = pgTable("comments", {
+  id: serial("id").primaryKey(),
+  articleId: integer("article_id")
+    .notNull()
+    .references(() => articles.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => publicUsers.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  status: commentStatusEnum("status").default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

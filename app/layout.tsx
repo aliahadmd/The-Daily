@@ -6,6 +6,7 @@ import Footer from "@/components/public/Footer";
 import { getCategories } from "@/lib/queries/taxonomy";
 import { getTags } from "@/lib/queries/taxonomy";
 import { getCountries } from "@/lib/queries/taxonomy";
+import { getUserSession } from "@/lib/user-auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,10 +33,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [categories, tags, countries] = await Promise.all([
-    getCategories(),
-    getTags(),
-    getCountries(),
+  const [[categories, tags, countries], user] = await Promise.all([
+    Promise.all([getCategories(), getTags(), getCountries()]),
+    getUserSession(),
   ]);
 
   return (
@@ -43,7 +43,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-cream`}
       >
-        <NavBar categories={categories} />
+        <NavBar categories={categories} user={user} />
         {children}
         <Footer categories={categories} tags={tags} countries={countries} />
       </body>
