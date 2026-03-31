@@ -7,6 +7,8 @@ import { renderMarkdown } from "@/lib/markdown";
 import ArticleCard from "@/components/public/ArticleCard";
 import { getUserSession } from "@/lib/user-auth";
 import CommentSection from "@/components/public/CommentSection";
+import { getSubscriptionByUserId } from "@/lib/queries/subscriptions";
+import SubscriptionDrawer from "@/components/public/SubscriptionDrawer";
 
 export const revalidate = 60;
 
@@ -43,6 +45,9 @@ export default async function ArticlePage({ params }: Props) {
     getRelatedArticles(article.id, article.categoryId, 4),
     getUserSession(),
   ]);
+
+  const subscription = user ? await getSubscriptionByUserId(user.userId) : null;
+  const isSubscriber = subscription?.status === "active";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -133,6 +138,11 @@ export default async function ArticlePage({ params }: Props) {
           className="prose prose-neutral max-w-none text-ink leading-relaxed"
           dangerouslySetInnerHTML={{ __html: htmlBody }}
         />
+
+        {/* Subscription drawer for non-subscribers */}
+        {!isSubscriber && (
+          <SubscriptionDrawer articleSlug={slug} userId={user?.userId ?? null} />
+        )}
 
         {/* Comments */}
         <CommentSection articleId={article.id} user={user} />

@@ -77,6 +77,7 @@ export default async function AdminUsersPage({
               <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Registered</th>
               <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Comments</th>
               <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Status</th>
+              <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Subscription</th>
               <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>Actions</th>
             </tr>
           </thead>
@@ -108,13 +109,25 @@ export default async function AdminUsersPage({
                   </span>
                 </td>
                 <td className="px-4 py-3">
+                  <span
+                    className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 border"
+                    style={
+                      user.subscriptionStatus === "active"
+                        ? { borderColor: "var(--ink)", color: "var(--ink)" }
+                        : { borderColor: "var(--accent)", color: "var(--accent)" }
+                    }
+                  >
+                    {user.subscriptionStatus}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
                   <UserActions id={user.id} status={user.status} />
                 </td>
               </tr>
             ))}
             {users.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm" style={{ color: "var(--muted)" }}>
+                <td colSpan={7} className="px-4 py-8 text-center text-sm" style={{ color: "var(--muted)" }}>
                   {search ? `No users found matching "${search}".` : "No users yet."}
                 </td>
               </tr>

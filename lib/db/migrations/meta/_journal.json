@@ -15,6 +15,13 @@
       "when": 1774981795117,
       "tag": "0001_unique_lilith",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774988790610,
+      "tag": "0002_damp_gunslinger",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { eq, or, ilike, sql } from "drizzle-orm";
 import { db } from "../db";
-import { publicUsers, comments } from "../db/schema";
+import { publicUsers, comments, subscriptions } from "../db/schema";
 
 // ─── Write queries ────────────────────────────────────────────────────────────
 
@@ -65,10 +65,12 @@ export async function listUsers(page: number, pageSize: number) {
         status: publicUsers.status,
         createdAt: publicUsers.createdAt,
         commentCount: sql<number>`cast(count(${comments.id}) as int)`,
+        subscriptionStatus: sql<"none" | "active" | "canceled">`coalesce(${subscriptions.status}, 'none')`,
       })
       .from(publicUsers)
       .leftJoin(comments, eq(comments.userId, publicUsers.id))
-      .groupBy(publicUsers.id)
+      .leftJoin(subscriptions, eq(subscriptions.userId, publicUsers.id))
+      .groupBy(publicUsers.id, subscriptions.status)
       .orderBy(publicUsers.createdAt)
       .limit(pageSize)
       .offset(offset),
@@ -93,11 +95,13 @@ export async function searchUsers(query: string, page: number, pageSize: number)
         status: publicUsers.status,
         createdAt: publicUsers.createdAt,
         commentCount: sql<number>`cast(count(${comments.id}) as int)`,
+        subscriptionStatus: sql<"none" | "active" | "canceled">`coalesce(${subscriptions.status}, 'none')`,
       })
       .from(publicUsers)
       .leftJoin(comments, eq(comments.userId, publicUsers.id))
+      .leftJoin(subscriptions, eq(subscriptions.userId, publicUsers.id))
       .where(or(ilike(publicUsers.username, pattern), ilike(publicUsers.email, pattern)))
-      .groupBy(publicUsers.id)
+      .groupBy(publicUsers.id, subscriptions.status)
       .orderBy(publicUsers.createdAt)
       .limit(pageSize)
       .offset(offset),
